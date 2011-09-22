@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules>
+  <import name="org.darevay.rooscaloo.demo._"/>
+  <rule name="Make cheddar cheese">
+    <if>
+      <object type="Person" binding="p"> p.status == "full" </object>
+      <object type="Person" binding="q"> q == p &amp;&amp; p.name == "Zeus" </object>
+      <not>
+        <object type="Cheese" binding="c"> c.name == "cheddar" </object>
+      </not>
+    </if>
+    <then>
+      engine.addFact(Cheese("cheddar"))
+      engine.println("%s made some cheddar cheese.", p.name)
+    </then>
+  </rule>
+  <rule name="Eat cheddar cheese">
+    <if>
+      <object type="Person" binding="p"> p.status == "hungry" </object>
+      <object type="Cheese" binding="c"> c.name == "cheddar" </object>
+    </if>
+    <then>
+      engine.removeFact(c) // remove the cheese
+      engine.println("%s is now full from eating %s", p.name, c.name)
+
+      // Update
+      engine.removeFact(p)
+      engine.addFact(Person(p.name, "full"))
+    </then>
+    <unfire>
+      engine.println("%s is no longer hungry, or there's no more cheese", p.name)
+    </unfire>
+  </rule>
+  <rule name="Monitor cheese">
+    <if>
+      <not>
+        <object type="Cheese"/>
+      </not>
+    </if>
+    <then>
+      engine.println("Monitor Cheese: There is no cheese")
+    </then>
+    <unfire>
+      engine.println("Monitor Cheese: There is SOME cheese!")
+    </unfire>
+  </rule>
+</rules>

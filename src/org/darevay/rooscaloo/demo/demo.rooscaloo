@@ -1,0 +1,47 @@
+import org.darevay.rooscaloo.demo._
+
+rule "Make cheddar cheese" {
+  p : Person where {- p.status == "full" -}
+  q : Person where {- q == p && p.name == "Zeus" -}
+  not {
+    c : Cheese where {- c.name == "cheddar" -}
+  }
+-->
+{-
+  engine.addFact(Cheese("cheddar"))
+  engine.println("%s made some cheddar cheese.", p.name)
+-}
+}
+
+rule "Eat cheddar cheese" {
+  p : Person where {- p.status == "hungry" -}
+  c : Cheese where {- c.name == "cheddar"  -}
+-->
+{-
+  engine.removeFact(c) // remove the cheese
+  engine.println("%s is now full from eating %s", p.name, c.name)
+
+  // Update
+  engine.removeFact(p)
+  engine.addFact(Person(p.name, "full"))
+-}
+
+<--
+{-
+  engine.println("%s is no longer hungry, or there's no more cheese", p.name)
+-}
+}
+
+rule MonitorCheese {
+  not {
+    Cheese
+  }
+-->
+{-
+  engine.println("Monitor Cheese: There is no cheese")
+-}
+<--
+{-
+  engine.println("Monitor Cheese: There is SOME cheese!")
+-}
+}

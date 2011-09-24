@@ -33,8 +33,11 @@ object Demo {
     println(name + "-----------------------------------------------------------------")
     val engine = new Engine()
 
+    val startLoad = System.nanoTime()
     engine.addRuleSet(ruleSet)
-
+    println("Loaded " + ruleSet.rules.size + " rules in " + (System.nanoTime() - startLoad) / 1000000 + "ms")
+    
+    val startRun = System.nanoTime()
     engine.addFact(new Person("Dave", "hungry"))
     engine.elaborate()
     engine.addFact(new Cheese("swiss"))
@@ -43,7 +46,8 @@ object Demo {
     engine.elaborate()
     engine.elaborate()
     engine.elaborate()
-
+    
+    println("Ran " + engine.cycle + " cycles in " + (System.nanoTime() - startRun) / 1000000 + "ms")
   }
   
 }

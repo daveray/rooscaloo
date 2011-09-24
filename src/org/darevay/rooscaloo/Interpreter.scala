@@ -11,16 +11,32 @@ import java.io.{ StringWriter, PrintWriter }
 import javax.script.ScriptException;
 
 import scala.tools.nsc.InterpreterResults._
-import scala.tools.nsc.{Interpreter => ScalaInterpreter, Settings}
+//import scala.tools.nsc.{Interpreter => ScalaInterpreter, Settings}
+import scala.tools.nsc._
+import scala.tools.nsc.interpreter._
 
 class ResultHolder(var value : Any)
 
 class Interpreter {
-   // http://lampsvn.epfl.ch/trac/scala/ticket/874
-   // http://lampsvn.epfl.ch/svn-repos/scala/scala/trunk/src/compiler/scala/tools/nsc/Interpreter.scala
+  // http://lampsvn.epfl.ch/trac/scala/ticket/874
+  // http://lampsvn.epfl.ch/svn-repos/scala/scala/trunk/src/compiler/scala/tools/nsc/Interpreter.scala
 
   private val writer = new java.io.StringWriter()
-  private val interpreter = new ScalaInterpreter(new Settings(), new PrintWriter(writer));
+  //  private val interpreter = new ScalaInterpreter(new Settings(), new PrintWriter(writer));
+
+  // cf http://stackoverflow.com/questions/4121567/embedded-scala-repl-inherits-parent-classpath
+  lazy val urls = java.lang.Thread.currentThread.getContextClassLoader match {
+    case cl: java.net.URLClassLoader => cl.getURLs.toList
+    case _ => error("classloader is not a URLClassLoader")
+  }
+  
+  lazy val classpath = urls map { _.toString }
+  val settings = new Settings()
+  
+  // The above code gets you the classpath in current context.
+  settings.classpath.value = classpath.distinct.mkString(java.io.File.pathSeparator)
+
+  private val interpreter = new IMain(settings, new PrintWriter(writer));
 
   /**
    * Bind the given value to the given variable name in the interpreter
